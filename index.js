@@ -35,6 +35,7 @@ async function run() {
     const userCollection = client.db("employee-management").collection("users");
     const workCollection = client.db("employee-management").collection("works");
     const reviewCollection = client.db("employee-management").collection("reviews");
+    const contactCollection = client.db("employee-management").collection("contacts");
 
 
 
@@ -182,6 +183,31 @@ async function run() {
       res.send({ hr });
     })
 
+    app.patch('/users/hr/:id', verifyToken,  async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updatedDoc = {
+        $set: {
+          role: 'hr'
+        }
+      }
+      const result = await userCollection.updateOne(filter, updatedDoc);
+      res.send(result);
+    })
+
+
+    app.patch('/users/fire/:id', verifyToken,  async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) };
+      const updatedDoc = {
+        $set: {
+          fired: 'fired'
+        }
+      }
+      const result = await userCollection.updateOne(filter, updatedDoc);
+      res.send(result);
+    })
+
 
    
 
@@ -209,7 +235,18 @@ app.get('/reviews', async (req, res) => {
   res.send(result);
 })
 
+// contacts
+app.post('/contacts', async (req, res) => {
+  const contact = req.body;
+  const result = await contactCollection.insertOne(contact);
+  res.send(result);
+});
 
+
+app.get('/contacts', async (req, res) => {
+  const result = await contactCollection.find().toArray();
+  res.send(result);
+})
 
 
   } finally {
